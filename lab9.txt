@@ -1,0 +1,14 @@
+stages:
+  - hello
+say-hello:
+  stage: hello
+  tags:
+    - myrunner
+  before_script:
+    - apt-get update -y
+    - apt-get install -y cowsay
+  script:
+    - /usr/games/cowsay "hello from GitLab CI"
+  after_script:
+    - echo "Cleaning up after job..."
+    - apt-get remove -y cowsay
