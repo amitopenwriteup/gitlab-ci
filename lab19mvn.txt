@@ -1,0 +1,24 @@
+stages:
+  - build
+  - publish
+
+build:
+  stage: build
+  tags:
+    - myrunner
+  before_script:
+    - apt-get update -y
+    - apt-get install -y maven
+  script:
+    - mvn clean package
+  artifacts:
+    paths:
+      - target/*.jar
+    expire_in: 1 hour
+
+publish:
+  stage: publish
+  tags:
+    - myrunner
+  script:
+    - echo "Publishing step placeholder. Add deployment or artifact upload here."
