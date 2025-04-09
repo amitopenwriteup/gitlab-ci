@@ -1,0 +1,27 @@
+Lab 8
+Modify the .gitlab-ci.yml
+
+stages:
+  - hello
+say-hello:
+  stage: hello
+  tags:
+    - myrunner
+  script:
+    - /usr/games/cowsay "hello"
+
+IT will fail
+ 
+
+Lab 8 -2
+stages:
+  - hello
+say-hello:
+  stage: hello
+  tags:
+    - myrunner
+  before_script:
+    - apt-get update -y
+    - apt-get install -y cowsay
+  script:
+    - /usr/games/cowsay "hello from GitL
