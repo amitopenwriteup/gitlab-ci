@@ -1,0 +1,43 @@
+image: debian:latest
+
+stages:
+  - prepare
+  - test
+  - deploy
+
+before_script:
+  - echo "Global setup starting..."
+  - apt-get update -y
+  - apt-get install -y curl
+  - echo "Global setup done."
+  - date
+
+prepare-job:
+  stage: prepare
+  script:
+    - echo "Preparing environment..."
+
+unit-tests:
+  stage: test
+  script:
+    - echo "Running unit tests..."
+    - curl --version
+    - echo "Oops, something went wrong"
+    - exit 1 
+  needs:
+    - job: prepare-job
+
+integration-tests:
+  stage: test
+  script:
+    - echo "Running integration tests..."
+    - curl https://example.com
+  needs:
+    - job: unit-tests
+
+deploy-job:
+  stage: deploy
+  script:
+    - echo "Deploying application..."
+  needs:
+    - job: integration-tests
