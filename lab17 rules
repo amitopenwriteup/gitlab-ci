@@ -1,0 +1,50 @@
+image: debian:latest
+
+stages:
+  - prepare
+  - test
+  - deploy
+
+before_script:
+  - echo "Global setup starting..."
+  - apt-get update -y
+  - apt-get install -y curl
+  - echo "Global setup done."
+  - date
+
+prepare-job:
+  stage: prepare
+  script:
+    - echo "Preparing environment..."
+    - echo "Sample artifact data" > mydata.txt
+  artifacts:
+    paths:
+      - mydata.txt
+
+unit-tests:
+  stage: test
+  script:
+    - echo "Running unit tests..."
+    - cat mydata.txt
+  dependencies:
+    - prepare-job
+
+integration-tests:
+  stage: test
+  script:
+    - echo "Running integration tests..."
+    - cat mydata.txt
+  dependencies:
+    - prepare-job
+
+deploy-job:
+  stage: deploy
+  script:
+    - echo "Deploying application..."
+    - cat mydata.txt
+  dependencies:
+    - prepare-job
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+      when: never
+    - when: always
