@@ -1,0 +1,28 @@
+default:
+  tags:
+    - global-runner
+
+stages:
+  - prepare
+  - test
+  - deploy
+
+prepare-job:
+  stage: prepare
+  script:
+    - echo "Preparing environment..."
+
+unit-tests:
+  stage: test
+  script:
+    - echo "Running unit tests..."
+
+integration-tests:
+  stage: test
+  script:
+    - echo "Running integration tests..."
+
+deploy-job:
+  stage: deploy
+  script:
+    - echo "Deploying application..."
