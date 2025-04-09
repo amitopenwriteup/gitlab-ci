@@ -18,4 +18,4 @@ say-hello:
   after_script:
     - apt-get remove -y cowsay
   except:
-    - main
+    - dev
