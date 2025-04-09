@@ -1,0 +1,42 @@
+stages:
+  - prepare
+  - test
+  - deploy
+prepare-job:
+  image: debian:latest
+  stage: prepare
+  before_script:
+    - echo "Setup for prepare..."
+    - apt-get update -y
+    - apt-get install -y curl
+  script:
+    - echo "Preparing environment..."
+
+unit-tests:
+  image: python:3.10
+  stage: test
+  before_script:
+    - echo "Setup for unit tests..."
+    - pip install requests
+  script:
+    - echo "Running unit tests..."
+    - python --version
+
+integration-tests:
+  image: alpine:latest
+  stage: test
+  before_script:
+    - echo "Setup for integration tests..."
+    - apk add --no-cache curl
+  script:
+    - echo "Running integration tests..."
+    - curl https://example.com
+
+deploy-job:
+  image: node:18
+  stage: deploy
+  before_script:
+    - echo "Setup for deployment..."
+    - node --version
+  script:
+    - echo "Deploying application..."
