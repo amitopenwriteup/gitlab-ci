@@ -1,0 +1,21 @@
+stages:
+  - hello
+variables:
+  MESSAGE: "hello from GitLab CI"
+say-hello:
+  stage: hello
+  tags:
+    - myrunner
+  before_script:
+    - apt-get update -y
+    - apt-get install -y cowsay
+  script:
+    - /usr/games/cowsay "$MESSAGE" > output.txt
+  artifacts:
+    paths:
+      - output.txt
+    expire_in: 1 hour
+  after_script:
+    - apt-get remove -y cowsay
+  except:
+    - main
