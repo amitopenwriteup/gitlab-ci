@@ -1,0 +1,47 @@
+stages:
+  - prepare
+  - test
+  - deploy
+
+prepare-job:
+  stage: prepare
+  tags:
+    - prepare-runner
+  before_script:
+    - echo "Setup for prepare..."
+    - apt-get update -y
+    - apt-get install -y curl
+  script:
+    - echo "Preparing environment..."
+
+unit-tests:
+  stage: test
+  tags:
+    - test-python-runner
+  before_script:
+    - echo "Setup for unit tests..."
+    - pip install requests
+  script:
+    - echo "Running unit tests..."
+    - python3 --version
+
+integration-tests:
+  stage: test
+  tags:
+    - test-alpine-runner
+  before_script:
+    - echo "Setup for integration tests..."
+    - apk add --no-cache curl
+  script:
+    - echo "Running integration tests..."
+    - curl https://example.com
+
+deploy-job:
+  stage: deploy
+  tags:
+    - deploy-node-runner
+  before_script:
+    - echo "Setup for deployment..."
+    - node --version
+  script:
+    - echo "Deploying application..."
