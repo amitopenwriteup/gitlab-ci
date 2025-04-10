@@ -1,0 +1,55 @@
+# Create a sub directoryci-templates/.gitlab-ci-sonar.yml
+sonar_scan_template:
+  stage: sonarcloud
+  image: ubuntu:22.04
+  before_script:
+    - apt-get update && apt-get install -y unzip wget openjdk-11-jdk
+    - wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-5.0.1.3006-linux.zip
+    - unzip sonar-scanner-cli-5.0.1.3006-linux.zip
+  script:
+    - ./sonar-scanner-5.0.1.3006-linux/bin/sonar-scanner
+        -Dsonar.projectKey=$SONAR_PROJECT_KEY
+        -Dsonar.organization=$SONAR_ORGANIZATION
+        -Dsonar.qualitygate.wait=true
+        -Dsonar.qualitygate.timeout=300
+        -Dsonar.sources=src/main/java/
+        -Dsonar.java.binaries=target/classes
+        -Dsonar.host.url=$SONAR_HOST_URL
+        -Dsonar.login=$SONAR_TOKEN
+
+---------------
+.gitlab-ci.yml
+include:
+  - project: 'ow1435929/sharedlibrary1'
+    file: '/ci-templates/.gitlab-ci-sonar.yml'
+    ref: master  # or tag/branch with the template
+
+stages:
+  - build
+  - sonarcloud
+  - publish
+
+variables:
+  SONAR_PROJECT_KEY: "myproj23"
+  SONAR_ORGANIZATION: "amitow123"
+  SONAR_TOKEN: "780336658825aea2f71e98579b0a4a9a89e8a57c"
+  SONAR_HOST_URL: "https://sonarcloud.io"
+
+build:
+  stage: build
+  image: maven:3.9.6-eclipse-temurin-11
+  script:
+    - mvn clean package
+  artifacts:
+    paths:
+      - target/
+      - src/
+
+publish:
+  stage: publish
+  script:
+    - echo "Deploy step placeholder"
+
+
+
+
