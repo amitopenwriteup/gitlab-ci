@@ -1,0 +1,32 @@
+stages:
+  - build
+  - scan
+
+variables:
+  IMAGE_TAG: "latest"
+  IMAGE_NAME: "$CI_REGISTRY_IMAGE:$IMAGE_TAG"
+
+# Step 1: Build and push image
+docker_build:
+  stage: build
+  image: docker:latest
+  services:
+    - docker:dind
+  variables:
+    DOCKER_TLS_CERTDIR: ""
+  before_script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" "$CI_REGISTRY"
+  script:
+    - docker build -t "$IMAGE_NAME" .
+    - docker push "$IMAGE_NAME"
+
+# Step 2: Trivy scan (remote image, no Docker required here)
+trivy_scan:
+  stage: scan
+  image: docker:latest
+  before_script:
+    - apk add --no-cache curl bash
+    - curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
+    - echo "$CI_JOB_TOKEN" | docker login -u gitlab-ci-token --password-stdin "$CI_REGISTRY"
+  script:
+    - trivy image "$IMAGE_NAME"
