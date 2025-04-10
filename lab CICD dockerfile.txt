@@ -1,0 +1,93 @@
+Create a new repo: cicd
+
+1) 
+1) Create a python file: app.py
+
+from flask import Flask
+
+app = Flask(__name__)
+
+@app.route('/')
+def hello_world():
+    return 'Hello, World!'
+
+if __name__ == '__main__':
+    app.run(debug=True, host='0.0.0.0',port=8080)
+
+2) Create a dockerfile
+
+FROM python:3.9-alpine
+
+WORKDIR /flask_app
+
+COPY requirements.txt .
+
+RUN pip install --no-cache-dir -r requirements.txt
+
+RUN pip install pytest
+
+EXPOSE 8080
+
+COPY app.py .
+
+CMD [ "python", "app.py" ]
+
+3) Create a requirements.txt file
+
+Flask==3.1.0
+
+4) Create PAT
+
+On the left sidebar, select your avatar.
+
+Select Edit profile.
+
+On the left sidebar, select Access tokens.
+
+Select Add new token.
+
+In Token name, enter a name for the token.
+
+Optional. In Token description, enter a description for the token.
+
+In Expiration date, enter an expiration date for the token.
+
+
+Select the desired scopes.api, read and write registry
+
+Select Create personal access token.
+
+5)Reminder for GitLab CI/CD Variables:
+Go to Project Settings > CI/CD > Variables and add:
+
+Key	Value
+CI_REGISTRY_USER	Your GitLab username
+CI_REGISTRY_PASSWORD	Your GitLab personal access token with api and readm write_registry scopes
+
+4) now create a .gitlab-ci.yml file build the package and publish to GitLab registry
+
+stages:
+  - build
+
+variables:
+  DOCKERFILE: "dockerfile"      # Dockerfile path
+  REGISTRY: "registry.gitlab.com/amitopenwriteup/cicd" # GitLab registry
+  IMAGE_NAME: "myimage"
+  IMAGE_TAG: "latest"
+  DOCKER_HOST: tcp://docker:2375/
+  DOCKER_TLS_CERTDIR: ""
+
+build_docker_image:
+  stage: build
+  image: docker:latest
+  services:
+    - docker:dind
+  before_script:
+    - echo "Logging into Docker registry..."
+    - echo "$CI_REGISTRY_PASSWORD" | docker login registry.gitlab.com -u "$CI_REGISTRY_USER" --password-stdin
+  script:
+    - echo "Building Docker image..."
+    - docker build -f $DOCKERFILE -t $REGISTRY/$IMAGE_NAME:$IMAGE_TAG .
+    - docker push $REGISTRY/$IMAGE_NAME:$IMAGE_TAG
+  only:
+    - main
