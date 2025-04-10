@@ -32,7 +32,7 @@ stages:
 variables:
   SONAR_PROJECT_KEY: "myproj23"
   SONAR_ORGANIZATION: "amitow123"
-  SONAR_TOKEN: "780336658825aea2f71e98579b0a4a9a89e8a57c"
+  SONAR_TOKEN: ""
   SONAR_HOST_URL: "https://sonarcloud.io"
 
 build:
