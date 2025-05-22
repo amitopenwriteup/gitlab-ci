@@ -1,0 +1,26 @@
+#modify .gitlab-ci.yml file in java project
+
+stages:
+  - build
+  - publish
+
+build:
+  image: maven # Explicit maven image with Java
+  stage: build
+  tags:
+    - myrunner
+  script:
+    - mvn clean package
+  artifacts:
+    paths:
+      - target/*.jar
+    expire_in: 1 hour
+
+publish:
+  stage: publish
+  tags:
+    - myrunner
+  needs: [build]        # Preferable for dependencies in new GitLab CI
+  script:
+    - echo "Publishing step placeholder. Add deployment or artifact upload here."
+    # Example: scp target/*.jar user@host:/path/

@@ -1,0 +1,61 @@
+variables:
+  MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
+
+stages:
+  - scm
+  - build
+  - test
+  - deploy
+
+# Parameterize environment selection (simulate Jenkins choice parameter)
+# In GitLab, use CI/CD variables or trigger pipelines with variables.
+
+scm_code:
+  stage: scm
+  image: maven
+  script:
+    - git clone https://github.com/hellokaton/java11-examples.git source
+  artifacts:
+    paths:
+      - source/
+  tags:
+    - myrunner
+
+build:
+  stage: build
+  image: maven
+  dependencies:
+    - scm_code
+  script:
+    - cd source
+    - mvn clean package
+  artifacts:
+    paths:
+      - source/target/
+  tags:
+    - myrunner
+
+test:
+  stage: test
+  image: maven
+  dependencies:
+    - build
+  script:
+    - cd source
+    - mvn test
+  tags:
+    - myrunner
+
+deploy:
+  stage: deploy
+  image: maven
+  dependencies:
+    - build
+  script:
+    - cd source
+    # Simulate deploy step; replace with real deployment commands
+    - echo "Deploying to production..."
+  tags:
+    - myrunner
+  rules:
+    - if: '$ENVIRONMENT == "prod"'

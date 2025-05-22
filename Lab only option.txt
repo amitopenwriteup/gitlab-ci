@@ -1,0 +1,47 @@
+stages:
+  - build
+  - publish
+
+build:
+  image: maven:3.8.7-jdk-11
+  stage: build
+  tags:
+    - myrunner
+  script:
+    - mvn clean package
+  artifacts:
+    paths:
+      - target/*.jar
+    expire_in: 1 hour
+  only:
+    - main         # Only run on the main branch
+    - merge_requests  # Or on merge request pipelines
+
+publish:
+  stage: publish
+  tags:
+    - myrunner
+  needs: [build]
+  script:
+    - echo "Publishing step placeholder. Add deployment or artifact upload here."
+  only:
+    - main         # Only run on the main branch (e.g., for production deploys)
+
+
+
+1. Set Up Your .gitlab-ci.yml
+Ensure your repository has the .gitlab-ci.yml file with the jobs and rules: as described.
+
+2. Push to Different Branches
+Push to main branch:
+
+Commit a change and push to the main branch.
+Expected: Both build and publish jobs should run (since their rules match main on push).
+Push to a feature branch:
+Create a branch, e.g., feature/test.
+Commit and push.
+Expected: Neither job will run (unless you add rules to allow it).
+
+3. Open a Merge Request
+Create a merge request (MR) from your feature branch into main.
+Expected: The build job should run (rules: for MR event), but the publish job should NOT run (since its rule is only for direct pushes to main).
