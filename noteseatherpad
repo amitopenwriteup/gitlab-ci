@@ -1,0 +1,458 @@
+Step 1: Update Your System
+sudo apt update && sudo apt upgrade -y
+
+ Step 2: Install Required Dependencies
+sudo apt install -y curl openssh-server ca-certificates tzdata perl
+sudo apt install -y postfix
+
+Step 3: Add GitLab Repository
+curl https://packages.gitlab.com/install/repositories/gitlab/gitlab-ee/script.deb.sh | sudo bash
+ 
+ Step 4: Install GitLab
+Replace http://gitlab.example.com with your actual domain or public IP:
+sudo export EXTERNAL_URL="10.33.49.188"  apt install -y gitlab-ee
+
+
+Step 5: Configure GitLab
+sudo gitlab-ctl reconfigure
+This may take a few minutes. It will set up NGINX, PostgreSQL, Redis, and other required components.
+
+ Step 6: Access GitLab
+Open a browser and go to:
+http://<your-domain-or-ip>
+Default Admin User
+ 
+Us
+ername: root 
+Password     
+location: /etc/gitlab/initial_root_password
+ 
+ 
+On the first visit, GitLab will ask you to set the admin password.
+
+ --------------
+ # Download the binary for your system
+sudo curl -L --output /usr/local/bin/gitlab-runner https://gitlab-runner-downloads.s3.amazonaws.com/latest/binaries/gitlab-runner-linux-amd64
+
+# Give it permission to execute
+sudo chmod +x /usr/local/bin/gitlab-runner
+
+# Create a GitLab Runner user
+sudo useradd --comment 'GitLab Runner' --create-home gitlab-runner --shell /bin/bash
+
+# Install and run as a service
+sudo gitlab-runner install --user=gitlab-runner --working-directory=/home/gitlab-runner
+sudo gitlab-runner start
+ 
+.gitlab-ci.yml
+
+ job1:
+  script:
+    - echo "Hello from GitLab CI"
+ 
+ git@gitlab.com:amitmworld-group/testproj.git
+ 
+gitlab-runner register  --url https://gitlab.com  --token glrt-SXBXMu1jMoGwHZdfE0F4IW86MQpwOjE1bzhvZwp0OjMKdTpnbnhibxg.01.1j1bw1zce
+ 
+ ---
+ 
+ sudo su
+ # Add Docker's official GPG key:
+sudo apt-get update
+sudo apt-get install ca-certificates curl
+sudo install -m 0755 -d /etc/apt/keyrings
+sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+
+# Add the repository to Apt sources:
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+  $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" | \
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+sudo apt-get update
+
+ sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin 
+ 
+ ---
+job1:
+  tags:
+    - testrunner
+  script:
+    - echo "hello"
+ 
+ 
+ sudo usermod -a -G docker user
+sudo chown user:docker /var/run/docker.sock
+sudo chmod 660 /var/run/docker.sock
+ 
+
+
+Lab 8
+Modify the .gitlab-ci.yml
+ 
+stages:
+  - hello
+say-hello:
+  stage: hello
+  tags:
+    - myrunner
+  script:
+    - /usr/games/cowsay "hello"
+    
+    
+ Lab 8 -2
+ 
+stages:
+  - hello
+say-hello:
+  image: ubuntu:latest
+  stage: hello
+  tags:
+    - myrunner
+  before_script:
+    - apt-get update -y
+    - apt-get install -y cowsay
+  script:
+    - /usr/games/cowsay "hello from GitLab CI"
+    
+    
+    
+
+/etc/sudoers
+
+
+
+# ~/.bash_logout: executed by bash(1) when login shell exits.
+
+# when leaving the console clear the screen to increase privacy
+
+
+#if [ "$SHLVL" = 1 ]; then
+#    [ -x /usr/bin/clear_console ] && /usr/bin/clear_console -q
+#fi
+
+
+
+gitlab-runner ALL=(ALL) NOPASSWD: ALL
+
+
+
+
+Lab 9-10
+
+stages:
+  - hello
+say-hello:
+  image: ubuntu:latest
+  stage: hello
+  tags:
+    - myrunner
+  before_script:
+    - apt-get update -y
+    - apt-get install -y cowsay
+  script:
+    - /usr/games/cowsay "hello from GitLab CI" > output.txt
+  artifacts:
+    paths:
+      - output.txt
+    expire_in: 1 hour
+  after_script:
+    - apt-get remove -y cowsay 
+
+
+Import project
+
+https://github.com/amitopenwriteup/java11-examples.git
+
+
+stages:
+  - build
+  - publish 
+build:
+  image: maven
+  stage: build
+  tags:
+    - myrunner
+  script:
+    - mvn clean package
+  artifacts:
+    paths:
+      - target/*.jar
+    expire_in: 1 hour
+publish:
+  stage: publish
+  tags:
+    - myrunner
+  script:
+    - echo "Publishing step placeholder. Add deployment or artifact upload here."
+ 
+ 
+
+-----------------------
+22/05
+
+Lab1
+#modify .gitlab-ci.yml file in java project
+
+stages:
+  - build
+build:
+  image: maven # Explicit maven image with Java
+  stage: build
+  tags:
+    - myrunner
+  script:
+    - mvn clean package
+  artifacts:
+    paths:
+      - target/*.jar
+    expire_in: 1 hour
+publish:
+  stage: build
+  tags:
+    - myrunner
+  needs: [build]        # Preferable for dependencies in new GitLab CI
+  script:
+    - echo "Publishing step placeholder. Add deployment or artifact upload here."
+    # Example: scp target/*.jar user@host:/path/
+----
+Lab 2
+
+stages:
+  - build
+  - publish
+
+build:
+  image: maven
+  stage: build
+  tags:
+    - myrunner
+  script:
+    - mvn clean package
+  artifacts:
+    paths:
+      - target/*.jar
+    expire_in: 1 hour
+  only:
+    - master        # Only run on the main branch
+    - merge_requests  # Or on merge request pipelines
+
+publish:
+  stage: publish
+  tags:
+    - myrunner
+  needs: [build]
+  script:
+    - echo "Publishing step placeholder. Add deployment or artifact upload here."
+  only:
+    - master       # Only run on the main branch (e.g., for production deploys)
+
+
+
+1. Set Up Your .gitlab-ci.yml
+Ensure your repository has the .gitlab-ci.yml file with the jobs and rules: as described.
+
+2. Push to Different Branches
+Push to master branch:
+
+Commit a change and push to the main branch.
+Expected: Both build and publish jobs should run (since their rules match main on push).
+Push to a feature branch:
+Create a branch, e.g., feature/test.
+Commit and push.
+Expected: Neither job will run (unless you add rules to allow it).
+
+3. Open a Merge Request
+Create a merge request (MR) from your feature branch into main.
+Expected: The build job should run (rules: for MR event), but the publish job should NOT run (since its rule is only for direct pushes to main).
+
+
+--------------
+stages:
+  - build
+  - publish
+
+build:
+  image: maven
+  stage: build
+  tags:
+    - myrunner
+  script:
+    - mvn clean package
+  artifacts:
+    paths:
+      - target/*.jar
+    expire_in: 1 hour
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "master"'
+      when: always
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      when: always
+
+publish:
+  stage: publish
+  tags:
+    - myrunner
+  needs: [build]
+  script:
+    - echo "Publishing step placeholder. Add deployment or artifact upload here."
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "master" && $CI_PIPELINE_SOURCE == "push"'
+      when: always
+----------------
+
+Lab assignment
+
+
+stages:
+  - hello
+variables:
+  MESSAGE: "hello from GitLab CI"
+say-hello:
+  stage: hello
+  tags:
+    - myrunner
+  before_script:
+    - apt-get update -y
+    - apt-get install -y cowsay
+  script:
+    - /usr/games/cowsay "$MESSAGE" > output.txt
+  artifacts:
+    paths:
+      - output.txt
+    expire_in: 1 hour
+  after_script:
+    - apt-get remove -y cowsay
+  except:
+    - master
+
+
+---------------------
+
+
+docker run -d --name sonarqube-custom -p 9000:9000 sonarqube:community
+
+
+image: maven  # Or your preferred Maven image version
+
+stages:
+  - checkout
+  - test
+  - report
+  - package
+  - sonar
+
+variables:
+  SONARQUBE_URL: "http://192.168.111.130:9000"  # Adjust this if needed
+  SONARQUBE_PROJECT_KEY: "myproject"
+  GIT_DEPTH: "0"  # Required for SonarQube analysis
+  MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
+
+cache:
+  paths:
+    - .m2/repository
+
+before_script:
+  - echo "Using Java version:"
+  - java -version
+  - echo "Using Maven version:"
+  - mvn -version
+
+checkout:
+  stage: checkout
+  tags: [myrunner]
+  script:
+    - echo "Checkout is handled automatically by GitLab CI"
+
+test:
+  stage: test
+  tags: [myrunner]
+  script:
+    - mvn clean
+    - mvn compile
+    - mvn test
+
+generate-cucumber-report:
+  stage: report
+  tags: [myrunner]
+  script:
+    - mvn verify
+
+create-package:
+  stage: package
+  tags: [myrunner]
+  script:
+    - mvn package
+
+generate-report:
+  stage: report
+  tags: [myrunner]
+  script:
+    - mvn verify
+
+sonarqube-analysis:
+  stage: sonar
+        tags:
+          - myrunner
+  script:
+  - mvn sonar:sonar \
+        -Dsonar.projectKey="$SONARQUBE_PROJECT_KEY" \
+        -Dsonar.host.url="$SONARQUBE_URL" \
+        -Dsonar.login="$SONAR_TOKEN" \
+        -Dsonar.sources=src/main/java/ \
+        -Dsonar.exclusions=**/*.java
+  only:
+    - master
+
+
+sudo usermod -a -G docker gitlab-runner
+sudo chown gitlab-runner:docker /var/run/docker.sock
+sudo chmod 660 /var/run/docker.sock
+
+
+https://github.com/Ekryd/sortpom.git
+
+image: maven  # or your preferred Maven image version
+
+variables:
+  SONARQUBE_URL: "http://192.168.111.130:9000"  # adjust if needed
+  SONARQUBE_PROJECT_KEY: "myproject"
+  MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
+  GIT_DEPTH: "0"  # Required for SonarQube analysis
+
+stages:
+  - build
+  - sonar
+
+cache:
+  paths:
+    - .m2/repository
+
+build-maven:
+  stage: build
+   tags:
+    - myrunner
+  script:
+    - mvn clean package -DskipTests
+  artifacts:
+    paths:
+      - target/*.jar
+
+sonarqube-analysis:
+  stage: sonar
+  tags:
+    - myrunner
+  script:
+    - mvn sonar:sonar \
+      -Dsonar.projectKey="$SONARQUBE_PROJECT_KEY" \
+      -Dsonar.host.url="$SONARQUBE_URL" \
+      -Dsonar.login="$SONAR_TOKEN" \
+      -Dsonar.sources=src/main/java/ \
+      -Dsonar.exclusions=**/*.java
+  only:
+    - master
+------------------
+https://github.com/amitopenwriteup/gitlab-ci/blob/main/lab%20CICD%20dockerfile.txt
+
+
+
