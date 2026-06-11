@@ -217,7 +217,7 @@ grafana             NodePort   80
 ```
 
 ##create .gitlab-ci.yml
-
+```
 stages:
   - validate
   - plan
@@ -277,7 +277,7 @@ terraform_apply:
 
   environment:
     name: monitoring
-
+```
 
 
 Get Grafana admin password:
