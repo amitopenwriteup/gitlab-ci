@@ -216,6 +216,70 @@ prometheus-server   NodePort   80
 grafana             NodePort   80
 ```
 
+##create .gitlab-ci.yml
+
+stages:
+  - validate
+  - plan
+  - apply
+
+variables:
+  TF_ROOT: "."
+  TF_IN_AUTOMATION: "true"
+
+default:
+  image:
+    name: hashicorp/terraform:1.8
+    entrypoint: [""]
+
+before_script:
+  - mkdir -p ~/.kube
+  - echo "$KUBE_CONFIG" > ~/.kube/config
+  - chmod 600 ~/.kube/config
+  - terraform --version
+
+cache:
+  key: terraform
+  paths:
+    - .terraform/
+
+terraform_validate:
+  stage: validate
+
+  script:
+    - terraform init
+    - terraform fmt -check
+    - terraform validate
+
+terraform_plan:
+  stage: plan
+
+  script:
+    - terraform init
+    - terraform plan -out=tfplan
+
+  artifacts:
+    paths:
+      - tfplan
+    expire_in: 1 day
+
+terraform_apply:
+  stage: apply
+
+  when: manual
+
+  script:
+    - terraform init
+    - terraform apply -auto-approve tfplan
+
+  dependencies:
+    - terraform_plan
+
+  environment:
+    name: monitoring
+
+
+
 Get Grafana admin password:
 
 ```bash
