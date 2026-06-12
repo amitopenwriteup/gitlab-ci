@@ -15,7 +15,7 @@ terraform-monitoring/
 ---
 ```
 mkdir terraform-monitoring
-terraform-monitoring
+cd terraform-monitoring
 
 ```
 ##vi providers.tf
