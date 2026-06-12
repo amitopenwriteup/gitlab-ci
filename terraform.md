@@ -15,6 +15,7 @@ terraform-monitoring/
 ---
 ```
 mkdir terraform-monitoring
+terraform-monitoring
 
 ```
 ##vi providers.tf
@@ -210,6 +211,16 @@ kubectl get pods -n monitoring
 
 kubectl get svc -n monitoring
 ```
+## push to gitlab (Create remote repo on gitlab)
+## vi .gitignore
+```
+.terraform*
+.terraform.tfstate*
+
+```
+
+## push your code changes to gitlab.com
+
 
 Expected services:
 
