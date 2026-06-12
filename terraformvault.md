@@ -74,12 +74,7 @@ sudo mkdir -p /opt/vault/data
 ```
 
 ```bash
-sudo vi /etc/vault.d/vault.hcl
-```
-
-Contents:
-
-```hcl
+sudo tee -a /etc/vault.d/vault.hcl > /dev/null <<'EOF'
 ui = true
 
 storage "raft" {
@@ -91,9 +86,8 @@ listener "tcp" {
   address = "0.0.0.0:8200"
   tls_disable = 1
 }
+EOF
 
-api_addr = "http://<VM-IP>:8200"
-cluster_addr = "http://<VM-IP>:8201"
 ```
 
 Enable service:
