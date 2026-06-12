@@ -13,8 +13,11 @@ terraform-monitoring/
 ```
 
 ---
+```
+mkdir terraform-monitoring
 
-## providers.tf
+```
+##vi providers.tf
 
 ```hcl
 terraform {
@@ -46,7 +49,7 @@ provider "helm" {
 
 ---
 
-## namespace.tf
+## vi namespace.tf
 
 ```hcl
 resource "kubernetes_namespace" "monitoring" {
@@ -99,7 +102,7 @@ resource "helm_release" "prometheus" {
 
 ---
 
-## grafana.tf
+## vi grafana.tf
 
 Deploy Grafana.
 
@@ -154,7 +157,7 @@ resource "helm_release" "grafana" {
 
 ---
 
-## variables.tf
+## vi variables.tf
 
 ```hcl
 variable "grafana_admin_user" {
