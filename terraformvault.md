@@ -431,7 +431,8 @@ stages:
 
 variables:
   TF_IN_AUTOMATION: "true"
-
+  TF_VAR_vault_addr: $VAULT_ADDR
+  TF_VAR_vault_token: $VAULT_TOKEN
 default:
   image:
     name: hashicorp/terraform:1.8
