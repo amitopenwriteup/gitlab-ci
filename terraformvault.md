@@ -355,8 +355,8 @@ resource "helm_release" "prometheus" {
 ```hcl
 resource "helm_release" "grafana" {
 
-  name       = "grafana"
-  namespace  = kubernetes_namespace.monitoring.metadata[0].name
+  name      = "grafana"
+  namespace = kubernetes_namespace.monitoring.metadata[0].name
 
   repository = "https://grafana.github.io/helm-charts"
   chart      = "grafana"
@@ -364,10 +364,8 @@ resource "helm_release" "grafana" {
   values = [
     yamlencode({
 
-      adminUser = "admin"
-
-      adminPassword =
-        data.vault_kv_secret_v2.grafana.data["admin_password"]
+      adminUser     = "admin"
+      adminPassword = data.vault_kv_secret_v2.grafana.data["admin_password"]
 
       service = {
         type = "NodePort"
@@ -375,8 +373,9 @@ resource "helm_release" "grafana" {
 
       persistence = {
         enabled = true
-        size = "10Gi"
+        size    = "10Gi"
       }
+
     })
   ]
 
