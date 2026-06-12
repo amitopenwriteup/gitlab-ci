@@ -74,12 +74,11 @@ sudo mkdir -p /opt/vault/data
 ```
 
 ```bash
-sudo tee -a /etc/vault.d/vault.hcl > /dev/null <<'EOF'
+sudo tee  /etc/vault.d/vault.hcl > /dev/null <<'EOF'
 ui = true
 
-storage "raft" {
+storage "file" {
   path = "/opt/vault/data"
-  node_id = "vault-node-1"
 }
 
 listener "tcp" {
