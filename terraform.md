@@ -174,7 +174,7 @@ variable "grafana_admin_password" {
 
 ---
 
-## terraform.tfvars
+## vi terraform.tfvars
 
 ```hcl
 grafana_admin_password = "StrongPassword123!"
@@ -182,7 +182,7 @@ grafana_admin_password = "StrongPassword123!"
 
 ---
 
-## Outputs
+## vi output.tf
 
 ```hcl
 output "grafana_namespace" {
