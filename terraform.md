@@ -279,9 +279,9 @@ terraform_plan:
 
 terraform_apply:
   stage: apply
-
+  tags:
+    - myrunner
   when: manual
-
   script:
     - terraform init
     - terraform apply -auto-approve tfplan
